@@ -23,9 +23,9 @@ import cv2
 '''Configs: '''
 
 # DATASET_NAME = 'Wu_MMSys_17'
-DATASET_NAME = 'David_MMSys_18'
+# DATASET_NAME = 'David_MMSys_18'
 # DATASET_NAME = 'Xu_CVPR_18'
-# DATASET_NAME = 'Nasrabadi_MMSys_19'
+DATASET_NAME = 'Nasrabadi_MMSys_19'
 
 SALMAP_SHAPE = None  # saliency_src; 不进行resize, 直接保存最原始的模型输出 (224x448);
 # SALMAP_SHAPE = (64, 128)  # saliency_paver;
@@ -116,7 +116,12 @@ def demo(log_path, config_dir, max_epoch, lr, clip_length, num_workers,
     for input_video in VIDEO_NAMES:
         print(f'Processing {input_video}...')
         input_video = VIDEO_DIR + input_video
-        probe = ffmpeg.probe(input_video)
+        try:
+            probe = ffmpeg.probe(input_video)
+        except ffmpeg.Error as e:
+            print('stdout:', e.stdout.decode('utf8'))
+            print('stderr:', e.stderr.decode('utf8'))
+            raise e
         video_stream = next((stream for stream in probe['streams'] 
                             if stream['codec_type'] == 'video'), None)
         orig_width = int(video_stream['width'])
@@ -157,7 +162,7 @@ def demo(log_path, config_dir, max_epoch, lr, clip_length, num_workers,
             vid = input_video.split('/')[-1].split('.')[0]
             fps = eval(video_stream['r_frame_rate'])
         elif DATASET_NAME == 'Nasrabadi_MMSys_19':
-            vid = input_video.split('/')[-1].split('.')[0]
+            vid = input_video.split('/')[-1]
             fps = eval(video_stream['r_frame_rate'])
         else:
             raise NotImplementedError
