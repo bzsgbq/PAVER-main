@@ -22,20 +22,23 @@ import cv2
 
 '''Configs: '''
 
-DATASET_NAME = 'Wu_MMSys_17'
-# DATASET_NAME = 'David_MMSys_18'
+# DATASET_NAME = 'Wu_MMSys_17'
+DATASET_NAME = 'David_MMSys_18'
 # DATASET_NAME = 'Xu_CVPR_18'
+# DATASET_NAME = 'Nasrabadi_MMSys_19'
 
 SALMAP_SHAPE = None  # saliency_src; 不进行resize, 直接保存最原始的模型输出 (224x448);
 # SALMAP_SHAPE = (64, 128)  # saliency_paver;
 # SALMAP_SHAPE = (128, 256)  # saliency_paver_mid;
 # SALMAP_SHAPE = (224, 448)  # saliency_paver_big;
 
+SALMAP_FOLDER = 'saliency_src' if SALMAP_SHAPE is None else f'saliency_{SALMAP_SHAPE[0]}x{SALMAP_SHAPE[1]}'
+
 
 if DATASET_NAME == 'Wu_MMSys_17':
     VIDEO_DIR = '/home/gbq/datasets/vr-dataset/vid-prep/'
     VIDEO_NAMES = [video_name for video_name in os.listdir(VIDEO_DIR) if video_name.startswith('1-')]
-    OUTPUT_DIR = f'../output/{DATASET_NAME}/'
+    OUTPUT_DIR = f'../output/{DATASET_NAME}/{SALMAP_FOLDER}'
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     SAMPLING_RATE = 0.2
     denominator = int(SAMPLING_RATE/0.2)
@@ -54,7 +57,7 @@ if DATASET_NAME == 'Wu_MMSys_17':
 
 elif DATASET_NAME == 'David_MMSys_18':
     VIDEO_DIR = '/dataset/saliency-datasets/Salient360/Videos/Stimuli/'
-    OUTPUT_DIR = f'../output/{DATASET_NAME}/'
+    OUTPUT_DIR = f'../output/{DATASET_NAME}/{SALMAP_FOLDER}/'
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     SAMPLING_RATE = 0.2
     VIDEO_NAMES = [video_name for video_name in os.listdir(VIDEO_DIR) if video_name.endswith('.mp4')]  # 从VIDEO_DIR中的获取视频名称
@@ -63,7 +66,7 @@ elif DATASET_NAME == 'David_MMSys_18':
 
 elif DATASET_NAME == 'Xu_CVPR_18':
     VIDEO_DIR = '/home/gbq/datasets/Xu_CVPR_18/videos/'
-    OUTPUT_DIR = f'../output/{DATASET_NAME}/'
+    OUTPUT_DIR = f'../output/{DATASET_NAME}/{SALMAP_FOLDER}/'
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     SAMPLING_RATE = 0.2
     VIDEO_NAMES = [video_name for video_name in os.listdir(VIDEO_DIR) if video_name.endswith('.mp4')]  # 从VIDEO_DIR中的获取视频名称
@@ -79,6 +82,15 @@ elif DATASET_NAME == 'Xu_CVPR_18':
             num_samples_per_video[video_name] = num_samples
         return num_samples_per_video
     NUM_SAMPLES_PER_VIDEO = get_num_samples_per_video('/home/gbq/datasets/Xu_CVPR_18/sampled_dataset/')
+
+
+elif DATASET_NAME == 'Nasrabadi_MMSys_19':
+    VIDEO_DIR = '/dataset/uniformed-vp-datasets/Nasrabadi_MMSys_19/dataset/Videos/'
+    OUTPUT_DIR = f'../output/{DATASET_NAME}/{SALMAP_FOLDER}/'
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    SAMPLING_RATE = 0.2
+    VIDEO_NAMES = [video_name for video_name in os.listdir(VIDEO_DIR) if video_name.endswith('.mp4')]  # 从VIDEO_DIR中的获取视频名称
+    NUM_SAMPLES_PER_VIDEO = { video_name : 300 for video_name in VIDEO_NAMES }
 
 
 else:
@@ -142,6 +154,9 @@ def demo(log_path, config_dir, max_epoch, lr, clip_length, num_workers,
             fps_file.close()
             print(f'fps: {fps}')
         elif DATASET_NAME == 'Xu_CVPR_18':
+            vid = input_video.split('/')[-1].split('.')[0]
+            fps = eval(video_stream['r_frame_rate'])
+        elif DATASET_NAME == 'Nasrabadi_MMSys_19':
             vid = input_video.split('/')[-1].split('.')[0]
             fps = eval(video_stream['r_frame_rate'])
         else:

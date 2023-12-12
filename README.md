@@ -1,3 +1,25 @@
+## My Pipeline:
+
+打开 `code/demo.py`, 配置好 `DATASET_NAME` 和 `SALMAP_SHAPE`;
+
+生成saliency maps:
+```bash
+cd code
+python cli.py demo with input_video='---' 'input_format'='mp4' ckpt_name='paver_ckpt.pt'
+```
+
+移动生成好的saliency maps:
+```bash
+cd ../output/David_MMSys_18/
+mv ./saliency_src/ /dataset/uniformed-vp-datasets/David_MMSys_18/
+```
+
+
+
+以下为原README.md内容:
+
+---
+
 # PAVER
 
 Official repository of Panoramic Vision Transformer for Saliency Detection in 360 Videos (ECCV 2022)
